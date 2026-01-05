@@ -130,8 +130,6 @@ dist
 .pnp.*
 
 
-wrangler.toml
-
 .wrangler/*
 
 .wrangler
