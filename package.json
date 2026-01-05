@@ -8,9 +8,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "dev": "wrangler pages dev . --d1=short",
+    "dev": "wrangler pages dev . --d1=DB",
     "clear": "kill -9 $(pgrep workerd)",
-    "d1": "wrangler d1 execute short --local --file=./short.sql"
+    "d1": "wrangler d1 execute DB --local --file=./short.sql"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/x-dr/short/issues"
   },
-  "homepage": "https://github.com/x-dr/short#readme"
+  "homepage": "https://github.com/x-dr/short#readme",
+  "overrides": {
+    "sourcemap-codec": "npm:@jridgewell/sourcemap-codec",
+    "rollup-plugin-inject": "npm:@rollup/plugin-inject"
+  }
 }

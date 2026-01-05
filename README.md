@@ -45,6 +45,27 @@ CREATE TABLE IF NOT EXISTS logs (
 9. 重新部署项目，完成。
 
 
+### 本地开发
+
+1. 安装依赖
+
+```bash
+npm install
+```
+
+2. 初始化数据库
+
+```bash
+npm run d1
+```
+
+3. 启动项目
+
+```bash
+npm run dev
+```
+
+
 ### API
 
 #### 短链生成
@@ -68,6 +89,3 @@ curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz"
   "link": "http://d.131213.xyz/<slug>"
 }
 ```
-
-
-
