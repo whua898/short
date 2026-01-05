@@ -2,7 +2,7 @@
 
 一个使用 Cloudflare Pages 创建的 URL 缩短器
 
-*Demo* : [https://d.131213.xyz/](https://d.131213.xyz/)
+*Demo* : [https://short.wh8.xx.kg/](https://short.wh8.xx.kg/)
 
 
 
@@ -76,10 +76,10 @@ npm run dev
 
 ```bash
 # POST /create
-curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz"}' https://d.131213.xyz/create
+curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz"}' https://short.wh8.xx.kg/create
 
 # 指定slug
-curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz","slug":"scxs"}' https://d.131213.xyz/create
+curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz","slug":"scxs"}' https://short.wh8.xx.kg/create
 
 ```
 
@@ -90,6 +90,6 @@ curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz"
 ```json
 {
   "slug": "<slug>",
-  "link": "http://d.131213.xyz/<slug>"
+  "link": "https://short.wh8.xx.kg/<slug>"
 }
 ```
