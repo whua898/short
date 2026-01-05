@@ -15,31 +15,35 @@
 4. 选择你创建的项目存储库，在`Set up builds and deployments`部分中，全部默认即可。
 5. 点击`Save and Deploy`，稍等片刻，你的网站就部署好了。
 6. 创建D1数据库参考[这里](https://github.com/x-dr/telegraph-Image/blob/main/docs/manage.md)
-7. 执行sql命令创建表（在控制台输入框粘贴下面语句执行即可）
+7. **执行sql命令创建表**
+   进入您创建的 D1 数据库的 **Console** (控制台)。
+   **注意：** Cloudflare 的网页控制台一次只能执行一条 SQL 语句。请将以下命令**分两次**复制并执行。
 
-```sql
-DROP TABLE IF EXISTS links;
-CREATE TABLE IF NOT EXISTS links (
-  `id` integer PRIMARY KEY NOT NULL,
-  `url` text,
-  `slug` text,
-  `ua` text,
-  `ip` text,
-  `status` int,
-  `create_time` DATE
-);
-DROP TABLE IF EXISTS logs;
-CREATE TABLE IF NOT EXISTS logs (
-  `id` integer PRIMARY KEY NOT NULL,
-  `url` text ,
-  `slug` text,
-  `referer` text,
-  `ua` text ,
-  `ip` text ,
-  `create_time` DATE
-);
+   **第一步：创建 `links` 表**
+   ```sql
+   CREATE TABLE IF NOT EXISTS links (
+     `id` integer PRIMARY KEY NOT NULL,
+     `url` text,
+     `slug` text,
+     `ua` text,
+     `ip` text,
+     `status` int,
+     `create_time` DATE
+   );
+   ```
 
-```
+   **第二步：创建 `logs` 表**
+   ```sql
+   CREATE TABLE IF NOT EXISTS logs (
+     `id` integer PRIMARY KEY NOT NULL,
+     `url` text ,
+     `slug` text,
+     `referer` text,
+     `ua` text ,
+     `ip` text ,
+     `create_time` DATE
+   );
+   ```
 8. 选择部署完成short项目，前往后台依次点击`设置`->`函数`->`D1 数据库绑定`->`编辑绑定`->变量名称填写：`DB` 命名空间 `选择你提前创建好的D1` 数据库绑定
 
 9. 重新部署项目，完成。
