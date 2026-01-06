@@ -34,9 +34,9 @@ export async function onRequest(context) {
 
     // 2. 只处理 POST 请求
     if (request.method !== 'POST') {
-        return new Response('Method Not Allowed', {
+        return new Response(JSON.stringify({ Code: 0, Message: 'Method Not Allowed' }), {
             status: 405,
-            headers: corsHeaders,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     }
 
@@ -61,7 +61,15 @@ export async function onRequest(context) {
         if (contentType.includes("application/json")) {
             // 模式 1: JSON 请求 (当前前端使用)
             try {
-                const body = await request.json();
+                // 增加对空 Body 的防护
+                const text = await request.text();
+                if (!text) {
+                     return new Response(JSON.stringify({ Code: 0, Message: 'Empty Request Body' }), {
+                        status: 400,
+                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    });
+                }
+                const body = JSON.parse(text);
                 url = body.url;
                 slug = body.slug;
                 overwrite = body.overwrite || false;
