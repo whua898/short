@@ -72,24 +72,53 @@ npm run dev
 
 ### API
 
-#### 短链生成
+#### `POST /create`
 
-```bash
-# POST /create
-curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz"}' https://short.wh8.xx.kg/create
+用于创建或获取短链接。
 
-# 指定slug
-curl -X POST -H "Content-Type: application/json" -d '{"url":"https://131213.xyz","slug":"scxs"}' https://short.wh8.xx.kg/create
-
-```
-
-
-
-> response:
+**请求 Body (JSON)**
 
 ```json
 {
-  "slug": "<slug>",
-  "link": "https://short.wh8.xx.kg/<slug>"
+  "url": "https://example.com/your-long-url",
+  "slug": "custom-name"
 }
 ```
+- `url` (必须): 原始长链接。
+- `slug` (可选): 自定义短链名，长度 2-10，不能以文件后缀结尾。
+
+---
+
+**响应**
+
+1.  **成功 (Status `200 OK`)**
+    -   情况1: 成功创建新的短链接。
+    -   情况2: `slug` 已存在且指向的 `url` 与请求中的 `url` 一致。
+    -   情况3: 未提供 `slug`，但 `url` 已存在对应的短链接。
+
+    ```json
+    {
+      "slug": "your-slug",
+      "link": "https://short.wh8.xx.kg/your-slug"
+    }
+    ```
+
+2.  **`slug` 冲突 (Status `409 Conflict`)**
+    -   当提供的 `slug` 已存在，但指向的 `url` 与请求中的 `url` **不一致**时触发。
+    -   响应体中会额外包含 `existingUrl` 字段。
+
+    ```json
+    {
+      "message": "Slug already exists.",
+      "existingUrl": "https://example.com/the-old-url"
+    }
+    ```
+
+3.  **请求错误 (Status `400 Bad Request`)**
+    -   原因: `url` 参数缺失、`url` 格式不正确、`slug` 格式不正确等。
+
+    ```json
+    {
+      "message": "Error description"
+    }
+    ```
