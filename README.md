@@ -72,68 +72,58 @@ npm run dev
 
 ### API
 
-#### `POST /create`
+#### `POST /short`
 
-用于创建或获取短链接。
+用于创建或获取短链接。兼容 `v1.mk` (MyUrls) 协议。
 
-**请求 Body (JSON)**
+**请求方式 A: JSON (推荐)**
 
-```json
-{
-  "url": "https://example.com/your-long-url",
-  "slug": "custom-name",
-  "overwrite": false
-}
-```
-- `url` (必须): 原始长链接。必须以 `http://` 或 `https://` 开头。
-- `slug` (可选): 自定义短链名。长度 2-10 字符，不能以文件后缀（如 `.png`）结尾。
-- `overwrite` (可选): `boolean` 类型，默认为 `false`。当 `slug` 冲突时，如果此项为 `true`，则会用新的 `url` 覆盖旧的记录。
+- **Content-Type**: `application/json`
+- **Body**:
+  ```json
+  {
+    "url": "https://example.com/your-long-url",
+    "slug": "custom-name",
+    "overwrite": false
+  }
+  ```
+  - `url` (必须): 原始长链接。
+  - `slug` (可选): 自定义短链名。
+  - `overwrite` (可选): `boolean`，默认 `false`。是否覆盖已存在的短链。
+
+**请求方式 B: Form Data (兼容 v1.mk)**
+
+- **Content-Type**: `multipart/form-data`
+- **Body**:
+  - `longUrl`: (必须) 原始长链接（支持 Base64 编码）。
+  - `shortKey`: (可选) 自定义短链名。
 
 ---
 
-**响应**
+**响应 (统一格式)**
 
 1.  **成功 (Status `200 OK`)**
-    -   情况1: 成功创建新的短链接。
-    -   情况2: `slug` 已存在且指向的 `url` 与请求中的 `url` 一致。
-    -   情况3: 未提供 `slug`，但 `url` 已存在对应的短链接。
-    -   情况4: `slug` 冲突，但请求中 `overwrite` 为 `true`，成功覆盖。
-
     ```json
     {
-      "slug": "your-slug",
-      "link": "https://short.wh8.xx.kg/your-slug"
+      "Code": 1,
+      "ShortUrl": "https://short.wh8.xx.kg/your-slug"
     }
     ```
 
 2.  **`slug` 冲突 (Status `409 Conflict`)**
-    -   当提供的 `slug` 已存在，但指向的 `url` 与请求中的 `url` **不一致**，且请求中 **没有** `overwrite: true` 时触发。
-    -   响应体中会额外包含 `existingUrl` 字段，方便前端提示用户。
-
+    -   仅在 JSON 模式且 `overwrite: false` 时触发。
     ```json
     {
-      "message": "Slug already exists.",
+      "Code": 0,
+      "Message": "Slug already exists",
       "existingUrl": "https://example.com/the-old-url"
     }
     ```
 
-3.  **请求错误 (Status `400 Bad Request`)**
-    -   原因: JSON 格式错误、`url` 参数缺失、`url` 格式不正确、`slug` 格式不正确、尝试缩短本站域名等。
-
+3.  **错误 (Status `400` / `500`)**
     ```json
     {
-      "message": "Error description"
-    }
-    ```
-
-4.  **方法不允许 (Status `405 Method Not Allowed`)**
-    -   原因: 使用了非 `POST` 方法（如 `GET`, `PUT` 等）访问接口。
-
-5.  **服务器错误 (Status `500 Internal Server Error`)**
-    -   原因: 服务器内部处理异常。
-
-    ```json
-    {
-      "message": "Error details..."
+      "Code": 0,
+      "Message": "Error description"
     }
     ```
