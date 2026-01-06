@@ -85,8 +85,8 @@ npm run dev
   "overwrite": false
 }
 ```
-- `url` (必须): 原始长链接。
-- `slug` (可选): 自定义短链名，长度 2-10，不能以文件后缀结尾。
+- `url` (必须): 原始长链接。必须以 `http://` 或 `https://` 开头。
+- `slug` (可选): 自定义短链名。长度 2-10 字符，不能以文件后缀（如 `.png`）结尾。
 - `overwrite` (可选): `boolean` 类型，默认为 `false`。当 `slug` 冲突时，如果此项为 `true`，则会用新的 `url` 覆盖旧的记录。
 
 ---
@@ -118,10 +118,22 @@ npm run dev
     ```
 
 3.  **请求错误 (Status `400 Bad Request`)**
-    -   原因: `url` 参数缺失、`url` 格式不正确、`slug` 格式不正确等。
+    -   原因: JSON 格式错误、`url` 参数缺失、`url` 格式不正确、`slug` 格式不正确、尝试缩短本站域名等。
 
     ```json
     {
       "message": "Error description"
+    }
+    ```
+
+4.  **方法不允许 (Status `405 Method Not Allowed`)**
+    -   原因: 使用了非 `POST` 方法（如 `GET`, `PUT` 等）访问接口。
+
+5.  **服务器错误 (Status `500 Internal Server Error`)**
+    -   原因: 服务器内部处理异常。
+
+    ```json
+    {
+      "message": "Error details..."
     }
     ```
