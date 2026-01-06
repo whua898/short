@@ -81,11 +81,13 @@ npm run dev
 ```json
 {
   "url": "https://example.com/your-long-url",
-  "slug": "custom-name"
+  "slug": "custom-name",
+  "overwrite": false
 }
 ```
 - `url` (必须): 原始长链接。
 - `slug` (可选): 自定义短链名，长度 2-10，不能以文件后缀结尾。
+- `overwrite` (可选): `boolean` 类型，默认为 `false`。当 `slug` 冲突时，如果此项为 `true`，则会用新的 `url` 覆盖旧的记录。
 
 ---
 
@@ -95,6 +97,7 @@ npm run dev
     -   情况1: 成功创建新的短链接。
     -   情况2: `slug` 已存在且指向的 `url` 与请求中的 `url` 一致。
     -   情况3: 未提供 `slug`，但 `url` 已存在对应的短链接。
+    -   情况4: `slug` 冲突，但请求中 `overwrite` 为 `true`，成功覆盖。
 
     ```json
     {
@@ -104,8 +107,8 @@ npm run dev
     ```
 
 2.  **`slug` 冲突 (Status `409 Conflict`)**
-    -   当提供的 `slug` 已存在，但指向的 `url` 与请求中的 `url` **不一致**时触发。
-    -   响应体中会额外包含 `existingUrl` 字段。
+    -   当提供的 `slug` 已存在，但指向的 `url` 与请求中的 `url` **不一致**，且请求中 **没有** `overwrite: true` 时触发。
+    -   响应体中会额外包含 `existingUrl` 字段，方便前端提示用户。
 
     ```json
     {

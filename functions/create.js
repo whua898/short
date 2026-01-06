@@ -64,7 +64,7 @@ export async function onRequest(context) {
             });
         }
 
-        const { url, slug } = body;
+        const { url, slug, overwrite = false } = body; // 新增 overwrite 标志，默认为 false
 
         if (!url) {
             return new Response(JSON.stringify({ message: 'Missing required parameter: url.' }), {
@@ -95,10 +95,22 @@ export async function onRequest(context) {
                         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                     });
                 } else {
-                    return new Response(JSON.stringify({ message: 'Slug already exists.', existingUrl: existUrl.existUrl }), {
-                        status: 409,
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                    });
+                    // 如果 URL 不一致，检查 overwrite 标志
+                    if (overwrite === true) {
+                        // 执行覆盖操作
+                        await env.DB.prepare("UPDATE links SET url = ?, ip = ?, ua = ?, create_time = ? WHERE slug = ?")
+                            .bind(url, clientIP, userAgent, formattedDate, slug)
+                            .run();
+                        return new Response(JSON.stringify({ slug, link: `${origin}/${slug}` }), {
+                            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                        });
+                    } else {
+                        // 没有 overwrite 标志，返回冲突错误
+                        return new Response(JSON.stringify({ message: 'Slug already exists.', existingUrl: existUrl.existUrl }), {
+                            status: 409,
+                            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                        });
+                    }
                 }
             }
         }
