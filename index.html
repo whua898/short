@@ -265,7 +265,8 @@
           const body = { url: this.url }
           if (this.slug) body.slug = this.slug
 
-          fetch('/create', {
+          // 修改请求地址为 /short
+          fetch('/short', {
             method: 'post',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify(body)
@@ -273,12 +274,14 @@
             .then(res => res.json())
             .then(res => {
               this.loading = false
-              if (res.message) {
-                this.alert = { type: 'error', message: res.message }
+              // 适配新的响应格式：检查 Code 是否为 1
+              if (res.Code !== 1) {
+                this.alert = { type: 'error', message: res.Message || '未知错误' }
                 return
               }
 
-              this.url = res.link
+              // 适配新的响应字段：ShortUrl
+              this.url = res.ShortUrl
 
               $nextTick(() => {
                 $refs.url.select()
