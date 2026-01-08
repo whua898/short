@@ -45,7 +45,7 @@
       }
 
       h1 {
-        font-size: 5rem; /* 放大2倍 (原2.5rem) */
+        font-size: 5rem;
         font-weight: 300;
         text-align: center;
         opacity: .2;
@@ -62,25 +62,50 @@
         transition: opacity .3s;
       }
 
+      /* 修改：输入框容器样式 */
+      .input-group {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border: 1px solid var(--border-color);
+        border-radius: .25rem;
+        background: #fff;
+        transition: border .3s, box-shadow .3s;
+        padding: 0 .5rem; /* 容器内边距 */
+      }
+
+      .input-group:focus-within {
+        box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
+        border-color: var(--color-primary);
+      }
+
+      /* 输入框前缀标签 */
+      .input-prefix {
+        color: #868e96;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      /* 修改 input 样式以适应 group */
       input, select {
         -webkit-appearance: none;
         appearance: none;
         display: block;
         width: 100%;
-        padding: .5rem 1rem;
-        border: 1px solid var(--border-color);
-        border-radius: .25rem;
-        box-sizing: border-box;
+        padding: .5rem 0; /* 移除左右 padding，由 group 控制 */
+        border: none; /* 移除边框 */
+        background: transparent;
         color: #33404d;
         line-height: inherit;
         font-size: 1rem;
-        transition: border .3s, box-shadow .3s;
+        outline: 0; /* 移除 focus 轮廓 */
       }
 
-      input:focus, select:focus {
-        box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
-        border-color: var(--color-primary);
-        outline: 0;
+      /* select 特殊处理 */
+      select {
+         padding-right: 1rem; /* 留出箭头位置 */
       }
 
       details {
@@ -290,8 +315,8 @@
       .github-icon {
         display: inline-block;
         vertical-align: middle;
-        width: 48px; /* 放大2倍 (原24px) */
-        height: 48px; /* 放大2倍 (原24px) */
+        width: 48px;
+        height: 48px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 2C6.475 2 2 6.475 2 12a9.994 9.994 0 0 0 6.838 9.488c.5.087.687-.213.687-.476 0-.237-.013-1.024-.013-1.862-2.512.463-3.162-.612-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.362 1.087 2.937.825.088-.65.35-1.087.638-1.337-2.225-.25-4.55-1.113-4.55-4.938 0-1.088.387-1.987 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.026a9.28 9.28 0 0 1 2.5-.338c.85 0 1.7.112 2.5.338 1.912-1.287 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.687 0 3.838-2.337 4.688-4.562 4.938.362.312.675.912.675 1.85 0 1.337-.013 2.412-.013 2.75 0 .262.188.575.688.475A9.994 9.994 0 0 0 22 12c0-5.525-4.475-10-10-10z' fill='%23495057'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: center;
@@ -313,7 +338,10 @@
       <!-- 主输入框 -->
       <div class="row" style="margin-bottom: 0.5rem;">
           <div class="col">
-            <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
+            <div class="input-group">
+                <span class="input-prefix">链接:</span>
+                <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
+            </div>
           </div>
           <div class="col-auto" x-show="url">
               <a :href="url" target="_blank" style="display: block; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff; font-size: 0.9rem;">访问</a>
@@ -325,37 +353,42 @@
         <div>
 
           <!-- 第一行：生成短链设置 -->
-          <div class="row" style="margin-bottom: 0.25rem;"> <!-- 极小的下边距 -->
-            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成:</div>
+          <div class="row" style="margin-bottom: 0.25rem;">
             <div class="col">
-                <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
+                <div class="input-group">
+                    <span class="input-prefix">后缀:</span>
+                    <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
+                </div>
             </div>
             <div class="col-auto">
                 <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1rem;">生成</button>
             </div>
           </div>
 
-          <!-- 分割线：减小上下边距 -->
           <div style="border-top: 1px dashed var(--border-color); margin: 0.25rem 0;"></div>
 
           <!-- 第二行：反查长链 -->
           <div class="row">
-            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">反查:</div>
-
             <!-- 下拉列表 -->
             <div class="col">
-                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
-                  <option value="">-- 历史记录 --</option>
-                  <template x-for="item in customSlugs" :key="item.slug">
-                    <option :value="item.url" x-text="item.slug"></option>
-                  </template>
-                  <option value="" disabled x-show="customSlugs.length === 0">暂无</option>
-                </select>
+                <div class="input-group">
+                    <span class="input-prefix">历史:</span>
+                    <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+                      <option value="">-- 选择 --</option>
+                      <template x-for="item in customSlugs" :key="item.slug">
+                        <option :value="item.url" x-text="item.slug"></option>
+                      </template>
+                      <option value="" disabled x-show="customSlugs.length === 0">暂无</option>
+                    </select>
+                </div>
             </div>
 
             <!-- 手动输入 -->
             <div class="col">
-                <input placeholder="或手动输入..." x-model="querySlug" />
+                <div class="input-group">
+                    <span class="input-prefix">反查:</span>
+                    <input placeholder="输入后缀..." x-model="querySlug" />
+                </div>
             </div>
 
             <!-- 查询按钮 -->
