@@ -62,50 +62,25 @@
         transition: opacity .3s;
       }
 
-      /* 修改：输入框容器样式 */
-      .input-group {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        border: 1px solid var(--border-color);
-        border-radius: .25rem;
-        background: #fff;
-        transition: border .3s, box-shadow .3s;
-        padding: 0 .5rem; /* 容器内边距 */
-      }
-
-      .input-group:focus-within {
-        box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
-        border-color: var(--color-primary);
-      }
-
-      /* 输入框前缀标签 */
-      .input-prefix {
-        color: #868e96;
-        font-size: 0.9rem;
-        margin-right: 0.5rem;
-        white-space: nowrap;
-        user-select: none;
-      }
-
-      /* 修改 input 样式以适应 group */
       input, select {
         -webkit-appearance: none;
         appearance: none;
         display: block;
         width: 100%;
-        padding: .5rem 0; /* 移除左右 padding，由 group 控制 */
-        border: none; /* 移除边框 */
-        background: transparent;
+        padding: .5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: .25rem;
+        box-sizing: border-box;
         color: #33404d;
         line-height: inherit;
         font-size: 1rem;
-        outline: 0; /* 移除 focus 轮廓 */
+        transition: border .3s, box-shadow .3s;
       }
 
-      /* select 特殊处理 */
-      select {
-         padding-right: 1rem; /* 留出箭头位置 */
+      input:focus, select:focus {
+        box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
+        border-color: var(--color-primary);
+        outline: 0;
       }
 
       details {
@@ -338,10 +313,7 @@
       <!-- 主输入框 -->
       <div class="row" style="margin-bottom: 0.5rem;">
           <div class="col">
-            <div class="input-group">
-                <span class="input-prefix">链接:</span>
-                <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
-            </div>
+            <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
           </div>
           <div class="col-auto" x-show="url">
               <a :href="url" target="_blank" style="display: block; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff; font-size: 0.9rem;">访问</a>
@@ -353,42 +325,37 @@
         <div>
 
           <!-- 第一行：生成短链设置 -->
-          <div class="row" style="margin-bottom: 0.25rem;">
+          <div class="row" style="margin-bottom: 0.25rem;"> <!-- 极小的下边距 -->
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成:</div>
             <div class="col">
-                <div class="input-group">
-                    <span class="input-prefix">后缀:</span>
-                    <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
-                </div>
+                <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
             </div>
             <div class="col-auto">
                 <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1rem;">生成</button>
             </div>
           </div>
 
+          <!-- 分割线：减小上下边距 -->
           <div style="border-top: 1px dashed var(--border-color); margin: 0.25rem 0;"></div>
 
           <!-- 第二行：反查长链 -->
           <div class="row">
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">反查:</div>
+
             <!-- 下拉列表 -->
             <div class="col">
-                <div class="input-group">
-                    <span class="input-prefix">历史:</span>
-                    <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
-                      <option value="">-- 选择 --</option>
-                      <template x-for="item in customSlugs" :key="item.slug">
-                        <option :value="item.url" x-text="item.slug"></option>
-                      </template>
-                      <option value="" disabled x-show="customSlugs.length === 0">暂无</option>
-                    </select>
-                </div>
+                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+                  <option value="">-- 历史记录 --</option>
+                  <template x-for="item in customSlugs" :key="item.slug">
+                    <option :value="item.url" x-text="item.slug"></option>
+                  </template>
+                  <option value="" disabled x-show="customSlugs.length === 0">暂无</option>
+                </select>
             </div>
 
             <!-- 手动输入 -->
             <div class="col">
-                <div class="input-group">
-                    <span class="input-prefix">反查:</span>
-                    <input placeholder="输入后缀..." x-model="querySlug" />
-                </div>
+                <input placeholder="或手动输入..." x-model="querySlug" />
             </div>
 
             <!-- 查询按钮 -->
