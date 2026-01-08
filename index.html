@@ -59,7 +59,7 @@
         transition: opacity .3s;
       }
 
-      input {
+      input, select {
         -webkit-appearance: none;
         appearance: none;
         display: block;
@@ -74,7 +74,7 @@
         transition: border .3s, box-shadow .3s;
       }
 
-      input:focus {
+      input:focus, select:focus {
         box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
         border-color: var(--color-primary);
         outline: 0;
@@ -221,7 +221,7 @@
   </head>
   <body>
     <header><h1>short</h1></header>
-    <main x-data="app" x-cloak>
+    <main x-data="app" x-init="loadCustomSlugs()" x-cloak>
       <p x-show.transition.opacity="alert" :class="alert?.type" x-text="alert?.message"></p>
       <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
       <details>
@@ -229,6 +229,18 @@
         <div>
           <input placeholder="slug" x-model="slug" />
           <small>Slug 默认是随机生成的短 id。</small>
+
+          <!-- 新增：自定义短链下拉列表 -->
+          <div style="margin-top: 1rem;" x-show="customSlugs.length > 0">
+            <label for="custom-slug-select" style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">已有的自定义短链：</label>
+            <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+              <option value="">-- 选择以反填 --</option>
+              <template x-for="item in customSlugs" :key="item.slug">
+                <option :value="item.url" x-text="item.slug"></option>
+              </template>
+            </select>
+          </div>
+
         </div>
       </details>
       <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)">生成</button>
@@ -245,9 +257,33 @@
         slug: '',
         alert: null,
         loading: false,
+        customSlugs: [], // 存储自定义短链列表
+
         isValidated () {
           return !/^https?:\/\/.{3,}/.test(this.url)
         },
+
+        // 加载自定义短链列表
+        loadCustomSlugs() {
+          fetch('/list')
+            .then(res => res.json())
+            .then(res => {
+              if (res.Code === 1 && Array.isArray(res.Data)) {
+                this.customSlugs = res.Data;
+              }
+            })
+            .catch(e => console.error('Failed to load custom slugs:', e));
+        },
+
+        // 选择下拉项后反填
+        selectCustomSlug(selectedUrl) {
+          if (selectedUrl) {
+            this.url = selectedUrl;
+            // 也可以选择是否自动填充 slug 框，这里暂不填充，以免用户误以为要修改该 slug
+            // this.slug = ...
+          }
+        },
+
         submit ($refs, $nextTick) {
           if (!this.url) {
             this.alert = { type: 'error', message: '缺少必需的参数：url。' }
@@ -282,6 +318,11 @@
 
               // 适配新的响应字段：ShortUrl
               this.url = res.ShortUrl
+
+              // 成功生成后，刷新列表（如果是新的自定义 slug）
+              if (this.slug) {
+                  this.loadCustomSlugs();
+              }
 
               $nextTick(() => {
                 $refs.url.select()

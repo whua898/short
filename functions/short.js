@@ -61,7 +61,6 @@ export async function onRequest(context) {
         if (contentType.includes("application/json")) {
             // 模式 1: JSON 请求 (当前前端使用)
             try {
-                // 增加对空 Body 的防护
                 const text = await request.text();
                 if (!text) {
                      return new Response(JSON.stringify({ Code: 0, Message: 'Empty Request Body' }), {
@@ -158,7 +157,8 @@ export async function onRequest(context) {
                     // URL 不一致，检查 overwrite
                     if (overwrite === true) {
                         // 执行覆盖
-                        await env.DB.prepare("UPDATE links SET url = ?, ip = ?, ua = ?, create_time = ? WHERE slug = ?")
+                        // 关键修改：覆盖时，将 status 设为 2 (表示自定义)
+                        await env.DB.prepare("UPDATE links SET url = ?, ip = ?, ua = ?, create_time = ?, status = 2 WHERE slug = ?")
                             .bind(url, clientIP, userAgent, formattedDate, slug)
                             .run();
                         return new Response(JSON.stringify({ Code: 1, ShortUrl: `${origin}/${slug}` }), {
@@ -190,10 +190,12 @@ export async function onRequest(context) {
         }
 
         // 生成新 slug 并插入
+        // 关键修改：如果是自定义 slug，status = 2；否则 status = 1
+        const status = slug ? 2 : 1;
         const slug2 = slug ? slug : generateRandomString(4);
 
-        await env.DB.prepare(`INSERT INTO links (url, slug, ip, status, ua, create_time) VALUES (?, ?, ?, 1, ?, ?)`)
-            .bind(url, slug2, clientIP, userAgent, formattedDate)
+        await env.DB.prepare(`INSERT INTO links (url, slug, ip, status, ua, create_time) VALUES (?, ?, ?, ?, ?, ?)`)
+            .bind(url, slug2, clientIP, status, userAgent, formattedDate)
             .run();
 
         return new Response(JSON.stringify({ Code: 1, ShortUrl: `${origin}/${slug2}` }), {

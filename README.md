@@ -72,7 +72,7 @@ npm run dev
 
 ### API
 
-#### `POST /short`
+#### 1. 创建短链 `POST /short`
 
 用于创建或获取短链接。兼容 `v1.mk` (MyUrls) 协议。
 
@@ -98,33 +98,80 @@ npm run dev
   - `longUrl`: (必须) 原始长链接（支持 Base64 编码）。
   - `shortKey`: (可选) 自定义短链名。
 
----
-
 **响应 (统一格式)**
 
-1.  **成功 (Status `200 OK`)**
-    ```json
-    {
-      "Code": 1,
-      "ShortUrl": "https://short.wh8.xx.kg/your-slug"
-    }
-    ```
+- **成功 (Status `200 OK`)**
+  ```json
+  {
+    "Code": 1,
+    "ShortUrl": "https://short.wh8.xx.kg/your-slug"
+  }
+  ```
 
-2.  **`slug` 冲突 (Status `409 Conflict`)**
-    -   仅在 JSON 模式且 `overwrite: false` 时触发。
-    ```json
-    {
-      "Code": 0,
-      "Message": "Slug already exists",
-      "existingUrl": "https://example.com/the-old-url"
-    }
-    ```
+- **`slug` 冲突 (Status `409 Conflict`)**
+  - 仅在 JSON 模式且 `overwrite: false` 时触发。
+  ```json
+  {
+    "Code": 0,
+    "Message": "Slug already exists",
+    "existingUrl": "https://example.com/the-old-url"
+  }
+  ```
 
-3.  **错误 (Status `400` / `405` / `500`)**
-    -   包括参数错误、方法不允许、服务器内部错误等。
-    ```json
-    {
-      "Code": 0,
-      "Message": "Error description"
-    }
-    ```
+- **错误 (Status `400` / `405` / `500`)**
+  ```json
+  {
+    "Code": 0,
+    "Message": "Error description"
+  }
+  ```
+
+---
+
+#### 2. 反查长链 `POST /query`
+
+用于通过 `slug` 查询对应的原始长链接。
+
+- **Content-Type**: `application/json`
+- **Body**:
+  ```json
+  {
+    "slug": "custom-name"
+  }
+  ```
+
+**响应**
+
+- **成功 (Status `200 OK`)**
+  ```json
+  {
+    "Code": 1,
+    "Slug": "custom-name",
+    "LongUrl": "https://example.com/original-long-url",
+    "CreateTime": "2023-10-27 10:00:00"
+  }
+  ```
+
+- **未找到 (Status `404 Not Found`)**
+  ```json
+  {
+    "Code": 0,
+    "Message": "Slug not found"
+  }
+  ```
+
+#### 3. 获取自定义列表 `GET /list`
+
+获取所有自定义生成的短链列表（即 `status=2` 的记录）。
+
+**响应**
+
+```json
+{
+  "Code": 1,
+  "Data": [
+    { "slug": "custom1", "url": "..." },
+    { "slug": "custom2", "url": "..." }
+  ]
+}
+```
