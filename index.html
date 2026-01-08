@@ -45,11 +45,12 @@
       }
 
       h1 {
-        font-size: 3rem;
+        font-size: 2.5rem; /* 稍微减小标题 */
         font-weight: 300;
         text-align: center;
         opacity: .2;
-        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem; /* 减小标题下边距 */
       }
 
       main[x-cloak] {
@@ -83,7 +84,7 @@
       }
 
       details {
-        margin: 1rem 0 1.5rem;
+        margin: 0.5rem 0 1rem; /* 减小 details 上下边距 */
         border: 1px solid var(--border-color);
         border-radius: .25rem;
         transition: background .3s;
@@ -103,14 +104,14 @@
       }
 
       details div {
-        padding: 1rem;
+        padding: 0.75rem 1rem; /* 减小内部 padding */
         border-top: 1px solid var(--border-color);
       }
 
       details small {
         margin: 0;
         font-size: .875rem;
-        line-height: 2;
+        line-height: 1.5;
         display: block;
         color: #868e96;
       }
@@ -181,7 +182,7 @@
         border-top: 1px solid var(--border-color);
         text-align: center;
         opacity: .5;
-        margin-top: 3rem;
+        margin-top: 1.5rem; /* 减小 footer 上边距 */
       }
 
       footer i {
@@ -191,7 +192,7 @@
 
       .success,
       .error {
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem; /* 减小提示框下边距 */
         padding: .5rem 1rem;
         border-radius: .25rem;
         color: #fff;
@@ -212,8 +213,8 @@
 
       .row {
         display: flex;
-        gap: 1rem;
-        align-items: flex-start;
+        gap: 0.5rem; /* 减小行内元素间距 */
+        align-items: center; /* 垂直居中对齐 */
       }
       .col {
         flex: 1;
@@ -226,16 +227,16 @@
         .row {
           flex-direction: column;
           gap: 0.5rem;
+          align-items: stretch;
         }
         .query-btn {
             width: 100%;
         }
       }
 
-      /* 新增：结果展示区样式 */
       .result-card {
-        margin-top: 1.5rem;
-        padding: 1rem;
+        margin-top: 1rem; /* 减小结果区上边距 */
+        padding: 0.75rem;
         border: 1px solid var(--color-primary);
         border-radius: .25rem;
         background: #fff;
@@ -244,7 +245,7 @@
       .result-item {
         display: flex;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem; /* 减小结果项间距 */
         flex-wrap: wrap;
       }
       .result-item:last-child {
@@ -253,7 +254,8 @@
       .result-label {
         font-weight: bold;
         margin-right: 0.5rem;
-        min-width: 4rem;
+        min-width: 3.5rem;
+        font-size: 0.9rem;
       }
       .result-value {
         flex: 1;
@@ -261,13 +263,15 @@
         margin-right: 0.5rem;
         font-family: monospace;
         background: #f1f3f5;
-        padding: 0.2rem 0.5rem;
+        padding: 0.1rem 0.4rem;
         border-radius: 0.2rem;
+        font-size: 0.9rem;
       }
       .result-actions a, .result-actions span {
         margin-left: 0.5rem;
         cursor: pointer;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
+        color: var(--color-primary);
       }
     </style>
   </head>
@@ -277,12 +281,12 @@
       <p x-show.transition.opacity="alert" :class="alert?.type" x-text="alert?.message"></p>
 
       <!-- 主输入框 -->
-      <div class="row" style="margin-bottom: 1rem;">
+      <div class="row" style="margin-bottom: 0.5rem;">
           <div class="col">
             <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
           </div>
           <div class="col-auto" x-show="url">
-              <a :href="url" target="_blank" style="display: block; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff;">访问</a>
+              <a :href="url" target="_blank" style="display: block; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff; font-size: 0.9rem;">访问</a>
           </div>
       </div>
 
@@ -291,41 +295,41 @@
         <div>
 
           <!-- 第一行：生成短链设置 -->
-          <div class="row" style="align-items: center; margin-bottom: 1rem;">
-            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成短链：</div>
+          <div class="row" style="margin-bottom: 0.5rem;">
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成:</div>
             <div class="col">
                 <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
             </div>
             <div class="col-auto">
-                <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1.5rem;">生成</button>
+                <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1rem;">生成</button>
             </div>
           </div>
 
-          <div style="border-top: 1px dashed var(--border-color); margin: 1rem 0;"></div>
+          <div style="border-top: 1px dashed var(--border-color); margin: 0.5rem 0;"></div>
 
           <!-- 第二行：反查长链 -->
-          <div class="row" style="align-items: center;">
-            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">反查长链：</div>
+          <div class="row">
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">反查:</div>
 
             <!-- 下拉列表 -->
             <div class="col">
-                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)" style="margin-bottom: 0.5rem;">
-                  <option value="">-- 从历史记录选择 --</option>
+                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+                  <option value="">-- 历史记录 --</option>
                   <template x-for="item in customSlugs" :key="item.slug">
                     <option :value="item.url" x-text="item.slug"></option>
                   </template>
-                  <option value="" disabled x-show="customSlugs.length === 0">暂无历史记录</option>
+                  <option value="" disabled x-show="customSlugs.length === 0">暂无</option>
                 </select>
             </div>
 
             <!-- 手动输入 -->
             <div class="col">
-                <input placeholder="或手动输入后缀..." x-model="querySlug" />
+                <input placeholder="或手动输入..." x-model="querySlug" />
             </div>
 
             <!-- 查询按钮 -->
             <div class="col-auto">
-                <button class="query-btn" style="margin: 0; width: auto; padding: 0.5rem 1.5rem;" @click="queryBySlug()" :disabled="!querySlug">查询</button>
+                <button class="query-btn" style="margin: 0; width: auto; padding: 0.5rem 1rem;" @click="queryBySlug()" :disabled="!querySlug">查询</button>
             </div>
           </div>
 
@@ -335,7 +339,7 @@
       <!-- 结果展示区 -->
       <div class="result-card" x-show="resultShortUrl">
           <div class="result-item">
-              <span class="result-label">短链接:</span>
+              <span class="result-label">短链:</span>
               <span class="result-value" x-text="resultShortUrl"></span>
               <div class="result-actions">
                   <span @click="copyToClipboard(resultShortUrl)">[复制]</span>
@@ -367,7 +371,6 @@
         loading: false,
         customSlugs: [],
 
-        // 新增：结果展示数据
         resultShortUrl: '',
         resultLongUrl: '',
 
@@ -388,11 +391,10 @@
 
         selectCustomSlug(selectedUrl) {
           if (selectedUrl) {
-            // 自动填入查询框并触发查询，以获取完整信息（包括创建时间等，虽然这里只展示 URL）
             const selectedItem = this.customSlugs.find(item => item.url === selectedUrl);
             if (selectedItem) {
                 this.querySlug = selectedItem.slug;
-                this.queryBySlug(); // 直接触发查询，统一展示逻辑
+                this.queryBySlug();
             }
           }
         },
@@ -402,7 +404,7 @@
 
             this.loading = true;
             this.alert = null;
-            this.resultShortUrl = ''; // 清空上次结果
+            this.resultShortUrl = '';
 
             fetch('/query', {
                 method: 'post',
@@ -413,13 +415,11 @@
             .then(res => {
                 this.loading = false;
                 if (res.Code === 1) {
-                    // 构造完整短链 (假设当前域名就是短链域名)
                     const shortUrl = `${window.location.origin}/${res.Slug}`;
 
                     this.resultShortUrl = shortUrl;
                     this.resultLongUrl = res.LongUrl;
 
-                    // 同时也反填到输入框，方便修改
                     this.url = res.LongUrl;
                     this.slug = res.Slug;
 
@@ -441,7 +441,6 @@
                     setTimeout(() => this.alert = null, 2000);
                 });
             } else {
-                // Fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 document.body.appendChild(textArea);
@@ -466,7 +465,7 @@
 
           this.alert = null
           this.loading = true
-          this.resultShortUrl = ''; // 清空上次结果
+          this.resultShortUrl = '';
 
           const body = { url: this.url, overwrite: true }
           if (this.slug) body.slug = this.slug
@@ -484,9 +483,8 @@
                 return
               }
 
-              // 展示结果
               this.resultShortUrl = res.ShortUrl;
-              this.resultLongUrl = this.url; // 原始 URL
+              this.resultLongUrl = this.url;
 
               if (this.slug) {
                   this.loadCustomSlugs();
