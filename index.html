@@ -83,27 +83,35 @@
         outline: 0;
       }
 
-      /* 新增：输入框容器，用于定位右侧提示 */
+      /* 输入框容器 */
       .input-wrapper {
         position: relative;
         width: 100%;
       }
 
-      /* 新增：右侧固定提示 */
+      /* 右侧固定提示 */
       .input-suffix {
         position: absolute;
         right: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #adb5bd; /* 浅灰色 */
+        color: #adb5bd;
         font-size: 0.875rem;
-        pointer-events: none; /* 让点击穿透到输入框 */
+        pointer-events: none;
         white-space: nowrap;
       }
 
-      /* 调整带后缀的输入框 padding，防止文字重叠 */
+      /* 调整带后缀的输入框 padding */
       .input-with-suffix {
-        padding-right: 11rem; /* 根据提示文字长度调整 */
+        padding-right: 8rem; /* 默认预留空间 */
+      }
+
+      /* 针对不同长度的提示语微调 padding */
+      .input-with-suffix.short-suffix {
+        padding-right: 6rem;
+      }
+      .input-with-suffix.long-suffix {
+        padding-right: 11rem;
       }
 
       details {
@@ -336,7 +344,10 @@
       <!-- 主输入框 -->
       <div class="row" style="margin-bottom: 0.5rem;">
           <div class="col">
-            <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
+            <div class="input-wrapper">
+                <input class="input-with-suffix short-suffix" x-model="url" x-ref="url" />
+                <span class="input-suffix">输入长链接</span>
+            </div>
           </div>
           <div class="col-auto" x-show="url">
               <a :href="url" target="_blank" style="display: block; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff; font-size: 0.9rem;">访问</a>
@@ -351,10 +362,9 @@
           <div class="row" style="margin-bottom: 0.25rem;">
             <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成:</div>
             <div class="col">
-                <!-- 修改：使用 input-wrapper 包裹输入框和后缀提示 -->
                 <div class="input-wrapper">
-                    <input class="input-with-suffix" placeholder="输入自定义后缀" x-model="slug" />
-                    <span class="input-suffix">留空随机</span>
+                    <input class="input-with-suffix long-suffix" x-model="slug" />
+                    <span class="input-suffix">输入自定义后缀，留空随机</span>
                 </div>
             </div>
             <div class="col-auto">
@@ -382,7 +392,10 @@
 
             <!-- 手动输入 -->
             <div class="col">
-                <input placeholder="或手动输入..." x-model="querySlug" />
+                <div class="input-wrapper">
+                    <input class="input-with-suffix short-suffix" x-model="querySlug" />
+                    <span class="input-suffix">输入后缀</span>
+                </div>
             </div>
 
             <!-- 查询按钮 -->
