@@ -18,11 +18,13 @@
       }
 
       body {
-        max-width: 30rem;
+        /* 修改：增加最大宽度，适应更宽的屏幕 */
+        max-width: 60rem;
+        width: 90%; /* 在小屏幕上保持边距 */
         margin-left: auto;
         margin-right: auto;
-        padding-left: 2rem;
-        padding-right: 2rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
         color: var(--body-color);
         background: var(--body-bg);
         font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -44,11 +46,11 @@
       }
 
       h1 {
-        font-size: 3rem; /* 减小标题字号 */
+        font-size: 3rem;
         font-weight: 300;
         text-align: center;
         opacity: .2;
-        margin-bottom: 1.5rem; /* 减小标题下边距 */
+        margin-bottom: 1.5rem;
       }
 
       main[x-cloak] {
@@ -82,7 +84,7 @@
       }
 
       details {
-        margin: 1rem 0 1.5rem; /* 减小 details 上下边距 */
+        margin: 1rem 0 1.5rem;
         border: 1px solid var(--border-color);
         border-radius: .25rem;
         transition: background .3s;
@@ -110,7 +112,7 @@
         margin: 0;
         font-size: .875rem;
         line-height: 2;
-        display: block; /* 确保换行 */
+        display: block;
         color: #868e96;
       }
 
@@ -120,7 +122,7 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        margin-bottom: 3rem; /* 减小按钮下边距 */
+        /* margin-bottom: 3rem;  移除了这个大下边距，由布局控制 */
         padding: .5rem .75rem;
         border: 1px solid var(--color-primary);
         border-radius: .25rem;
@@ -165,10 +167,8 @@
         animation: rotate .5s linear infinite;
       }
 
-      /* 新增：查询按钮样式 */
       .query-btn {
-        margin-top: 0.5rem;
-        margin-bottom: 0;
+        /* margin-top: 0.5rem;  由 flex 控制 */
         background: #fff;
         color: var(--color-primary);
         border: 1px solid var(--color-primary);
@@ -184,6 +184,7 @@
         border-top: 1px solid var(--border-color);
         text-align: center;
         opacity: .5;
+        margin-top: 3rem;
       }
 
       footer i {
@@ -234,47 +235,85 @@
       .github-icon:hover {
         opacity: 1;
       }
+
+      /* 新增：Flex 布局辅助类 */
+      .row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .col {
+        flex: 1;
+      }
+      .col-auto {
+        flex: 0 0 auto;
+      }
+
+      /* 响应式调整：小屏幕下堆叠 */
+      @media (max-width: 600px) {
+        .row {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .query-btn {
+            width: 100%;
+        }
+      }
     </style>
   </head>
   <body>
     <header><h1>short</h1></header>
     <main x-data="app" x-init="loadCustomSlugs()" x-cloak>
       <p x-show.transition.opacity="alert" :class="alert?.type" x-text="alert?.message"></p>
-      <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
 
-      <!-- 修改：默认展开 -->
+      <!-- 主输入框 -->
+      <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" style="margin-bottom: 1rem;" />
+
       <details open>
         <summary>自定义设置 / 反查</summary>
         <div>
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: bold;">生成短链：</label>
-            <input placeholder="输入自定义后缀 (slug)" x-model="slug" />
-            <small>留空则随机生成。若输入已存在的后缀，将尝试覆盖。</small>
+
+          <!-- 第一行：生成短链设置 -->
+          <div class="row" style="align-items: center; margin-bottom: 1rem;">
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成短链：</div>
+            <div class="col">
+                <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
+            </div>
+            <div class="col-auto">
+                <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1.5rem;">生成</button>
+            </div>
           </div>
 
           <div style="border-top: 1px dashed var(--border-color); margin: 1rem 0;"></div>
 
-          <div>
-            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: bold;">反查长链：</label>
-            <!-- 下拉列表 -->
-            <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)" style="margin-bottom: 0.5rem;">
-              <option value="">-- 从历史记录选择 --</option>
-              <template x-for="item in customSlugs" :key="item.slug">
-                <option :value="item.url" x-text="item.slug"></option>
-              </template>
-              <option value="" disabled x-show="customSlugs.length === 0">暂无历史记录</option>
-            </select>
+          <!-- 第二行：反查长链 -->
+          <div class="row" style="align-items: center;">
+            <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">反查长链：</div>
 
-            <!-- 手动查询 -->
-            <div style="display: flex; gap: 0.5rem;">
-                <input placeholder="输入后缀反查..." x-model="querySlug" style="flex: 1;" />
-                <button class="query-btn" style="width: auto;" @click="queryBySlug()" :disabled="!querySlug">查询</button>
+            <!-- 下拉列表 -->
+            <div class="col">
+                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+                  <option value="">-- 从历史记录选择 --</option>
+                  <template x-for="item in customSlugs" :key="item.slug">
+                    <option :value="item.url" x-text="item.slug"></option>
+                  </template>
+                  <option value="" disabled x-show="customSlugs.length === 0">暂无历史记录</option>
+                </select>
+            </div>
+
+            <!-- 手动输入 -->
+            <div class="col">
+                <input placeholder="或手动输入后缀..." x-model="querySlug" />
+            </div>
+
+            <!-- 查询按钮 -->
+            <div class="col-auto">
+                <button class="query-btn" style="margin: 0; width: auto; padding: 0.5rem 1.5rem;" @click="queryBySlug()" :disabled="!querySlug">查询</button>
             </div>
           </div>
 
         </div>
       </details>
-      <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)">生成短链</button>
     </main>
     <footer>
      <a href="https://github.com/whua898/short" target="_blank" title="GitHub Repository">
@@ -286,7 +325,7 @@
       const app = {
         url: '',
         slug: '',
-        querySlug: '', // 用于手动查询的 slug
+        querySlug: '',
         alert: null,
         loading: false,
         customSlugs: [],
@@ -309,17 +348,15 @@
         selectCustomSlug(selectedUrl) {
           if (selectedUrl) {
             this.url = selectedUrl;
-            // 同时也把 slug 填进去，方便用户看
             const selectedItem = this.customSlugs.find(item => item.url === selectedUrl);
             if (selectedItem) {
                 this.slug = selectedItem.slug;
-                this.querySlug = selectedItem.slug; // 也填入查询框
+                this.querySlug = selectedItem.slug;
             }
             this.alert = { type: 'success', message: '已反填长链接' };
           }
         },
 
-        // 手动查询功能
         queryBySlug() {
             if (!this.querySlug) return;
 
@@ -336,11 +373,11 @@
                 this.loading = false;
                 if (res.Code === 1) {
                     this.url = res.LongUrl;
-                    this.slug = res.Slug; // 同时也填入生成框，方便用户直接覆盖
+                    this.slug = res.Slug;
                     this.alert = { type: 'success', message: `查询成功！长链接已反填。创建时间: ${res.CreateTime}` };
                 } else {
                     this.alert = { type: 'error', message: res.Message || '未找到该短链' };
-                    this.url = ''; // 清空 url 以免误导
+                    this.url = '';
                 }
             })
             .catch(e => {
@@ -363,7 +400,7 @@
           this.alert = null
           this.loading = true
 
-          const body = { url: this.url, overwrite: true } // 默认开启覆盖，或者让用户选择？这里为了方便直接开启
+          const body = { url: this.url, overwrite: true }
           if (this.slug) body.slug = this.slug
 
           fetch('/short', {
