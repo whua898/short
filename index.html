@@ -18,9 +18,8 @@
       }
 
       body {
-        /* 修改：增加最大宽度，适应更宽的屏幕 */
         max-width: 60rem;
-        width: 90%; /* 在小屏幕上保持边距 */
+        width: 90%;
         margin-left: auto;
         margin-right: auto;
         padding-left: 1rem;
@@ -122,7 +121,6 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        /* margin-bottom: 3rem;  移除了这个大下边距，由布局控制 */
         padding: .5rem .75rem;
         border: 1px solid var(--color-primary);
         border-radius: .25rem;
@@ -168,7 +166,6 @@
       }
 
       .query-btn {
-        /* margin-top: 0.5rem;  由 flex 控制 */
         background: #fff;
         color: var(--color-primary);
         border: 1px solid var(--color-primary);
@@ -213,30 +210,6 @@
         background: #ff8787;
       }
 
-      @keyframes rotate {
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .github-icon {
-        display: inline-block;
-        vertical-align: middle;
-        width: 36px;
-        height: 36px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 2C6.475 2 2 6.475 2 12a9.994 9.994 0 0 0 6.838 9.488c.5.087.687-.213.687-.476 0-.237-.013-1.024-.013-1.862-2.512.463-3.162-.612-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.362 1.087 2.937.825.088-.65.35-1.087.638-1.337-2.225-.25-4.55-1.113-4.55-4.938 0-1.088.387-1.987 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.026a9.28 9.28 0 0 1 2.5-.338c.85 0 1.7.112 2.5.338 1.912-1.287 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.687 0 3.838-2.337 4.688-4.562 4.938.362.312.675.912.675 1.85 0 1.337-.013 2.412-.013 2.75 0 .262.188.575.688.475A9.994 9.994 0 0 0 22 12c0-5.525-4.475-10-10-10z' fill='%23495057'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        opacity: 0.5;
-        transition: opacity 0.3s;
-      }
-
-      .github-icon:hover {
-        opacity: 1;
-      }
-
-      /* 新增：Flex 布局辅助类 */
       .row {
         display: flex;
         gap: 1rem;
@@ -249,7 +222,6 @@
         flex: 0 0 auto;
       }
 
-      /* 响应式调整：小屏幕下堆叠 */
       @media (max-width: 600px) {
         .row {
           flex-direction: column;
@@ -259,6 +231,44 @@
             width: 100%;
         }
       }
+
+      /* 新增：结果展示区样式 */
+      .result-card {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border: 1px solid var(--color-primary);
+        border-radius: .25rem;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      .result-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .result-item:last-child {
+        margin-bottom: 0;
+      }
+      .result-label {
+        font-weight: bold;
+        margin-right: 0.5rem;
+        min-width: 4rem;
+      }
+      .result-value {
+        flex: 1;
+        word-break: break-all;
+        margin-right: 0.5rem;
+        font-family: monospace;
+        background: #f1f3f5;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.2rem;
+      }
+      .result-actions a, .result-actions span {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+      }
     </style>
   </head>
   <body>
@@ -267,7 +277,14 @@
       <p x-show.transition.opacity="alert" :class="alert?.type" x-text="alert?.message"></p>
 
       <!-- 主输入框 -->
-      <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" style="margin-bottom: 1rem;" />
+      <div class="row" style="margin-bottom: 1rem;">
+          <div class="col">
+            <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
+          </div>
+          <div class="col-auto" x-show="url">
+              <a :href="url" target="_blank" style="display: block; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: #fff;">访问</a>
+          </div>
+      </div>
 
       <details open>
         <summary>自定义设置 / 反查</summary>
@@ -292,7 +309,7 @@
 
             <!-- 下拉列表 -->
             <div class="col">
-                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
+                <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)" style="margin-bottom: 0.5rem;">
                   <option value="">-- 从历史记录选择 --</option>
                   <template x-for="item in customSlugs" :key="item.slug">
                     <option :value="item.url" x-text="item.slug"></option>
@@ -314,6 +331,26 @@
 
         </div>
       </details>
+
+      <!-- 结果展示区 -->
+      <div class="result-card" x-show="resultShortUrl">
+          <div class="result-item">
+              <span class="result-label">短链接:</span>
+              <span class="result-value" x-text="resultShortUrl"></span>
+              <div class="result-actions">
+                  <span @click="copyToClipboard(resultShortUrl)">[复制]</span>
+                  <a :href="resultShortUrl" target="_blank">[访问]</a>
+              </div>
+          </div>
+          <div class="result-item">
+              <span class="result-label">指向:</span>
+              <span class="result-value" x-text="resultLongUrl" style="max-height: 3rem; overflow-y: auto; display: block;"></span>
+              <div class="result-actions">
+                  <a :href="resultLongUrl" target="_blank">[访问]</a>
+              </div>
+          </div>
+      </div>
+
     </main>
     <footer>
      <a href="https://github.com/whua898/short" target="_blank" title="GitHub Repository">
@@ -329,6 +366,10 @@
         alert: null,
         loading: false,
         customSlugs: [],
+
+        // 新增：结果展示数据
+        resultShortUrl: '',
+        resultLongUrl: '',
 
         isValidated () {
           return !/^https?:\/\/.{3,}/.test(this.url)
@@ -347,13 +388,12 @@
 
         selectCustomSlug(selectedUrl) {
           if (selectedUrl) {
-            this.url = selectedUrl;
+            // 自动填入查询框并触发查询，以获取完整信息（包括创建时间等，虽然这里只展示 URL）
             const selectedItem = this.customSlugs.find(item => item.url === selectedUrl);
             if (selectedItem) {
-                this.slug = selectedItem.slug;
                 this.querySlug = selectedItem.slug;
+                this.queryBySlug(); // 直接触发查询，统一展示逻辑
             }
-            this.alert = { type: 'success', message: '已反填长链接' };
           }
         },
 
@@ -362,6 +402,7 @@
 
             this.loading = true;
             this.alert = null;
+            this.resultShortUrl = ''; // 清空上次结果
 
             fetch('/query', {
                 method: 'post',
@@ -372,18 +413,44 @@
             .then(res => {
                 this.loading = false;
                 if (res.Code === 1) {
+                    // 构造完整短链 (假设当前域名就是短链域名)
+                    const shortUrl = `${window.location.origin}/${res.Slug}`;
+
+                    this.resultShortUrl = shortUrl;
+                    this.resultLongUrl = res.LongUrl;
+
+                    // 同时也反填到输入框，方便修改
                     this.url = res.LongUrl;
                     this.slug = res.Slug;
-                    this.alert = { type: 'success', message: `查询成功！长链接已反填。创建时间: ${res.CreateTime}` };
+
+                    this.alert = { type: 'success', message: `查询成功！创建时间: ${res.CreateTime}` };
                 } else {
                     this.alert = { type: 'error', message: res.Message || '未找到该短链' };
-                    this.url = '';
                 }
             })
             .catch(e => {
                 this.loading = false;
                 this.alert = { type: 'error', message: e.message };
             });
+        },
+
+        copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.alert = { type: 'success', message: '已复制到剪贴板' };
+                    setTimeout(() => this.alert = null, 2000);
+                });
+            } else {
+                // Fallback
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                this.alert = { type: 'success', message: '已复制到剪贴板' };
+                setTimeout(() => this.alert = null, 2000);
+            }
         },
 
         submit ($refs, $nextTick) {
@@ -399,6 +466,7 @@
 
           this.alert = null
           this.loading = true
+          this.resultShortUrl = ''; // 清空上次结果
 
           const body = { url: this.url, overwrite: true }
           if (this.slug) body.slug = this.slug
@@ -416,16 +484,16 @@
                 return
               }
 
-              this.url = res.ShortUrl
+              // 展示结果
+              this.resultShortUrl = res.ShortUrl;
+              this.resultLongUrl = this.url; // 原始 URL
 
               if (this.slug) {
                   this.loadCustomSlugs();
               }
 
-              $nextTick(() => {
-                $refs.url.select()
-                this.alert = { type: 'success', message: `链接 ${document.execCommand('Copy') ? '复制' : '生成'} ` }
-              })
+              this.alert = { type: 'success', message: '生成成功！' };
+
             })
             .catch(e => {
               this.alert = { type: 'error', message: e.message }
