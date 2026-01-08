@@ -28,7 +28,8 @@
      `ua` text,
      `ip` text,
      `status` int,
-     `create_time` DATE
+     `create_time` DATE,
+     `is_custom` integer DEFAULT 0
    );
    ```
 
@@ -44,6 +45,13 @@
      `create_time` DATE
    );
    ```
+   
+   **如果是旧版本升级：**
+   请在 Console 中执行以下命令来添加 `is_custom` 字段，用于区分自定义短链：
+   ```sql
+   ALTER TABLE links ADD COLUMN is_custom INTEGER DEFAULT 0;
+   ```
+
 8. 选择部署完成short项目，前往后台依次点击`设置`->`函数`->`D1 数据库绑定`->`编辑绑定`->变量名称填写：`DB` 命名空间 `选择你提前创建好的D1` 数据库绑定
 
 9. 重新部署项目，完成。
@@ -162,7 +170,7 @@ npm run dev
 
 #### 3. 获取自定义列表 `GET /list`
 
-获取所有自定义生成的短链列表（即 `status=2` 的记录）。
+获取所有自定义生成的短链列表（即 `is_custom=1` 的记录）。
 
 **响应**
 
@@ -175,3 +183,11 @@ npm run dev
   ]
 }
 ```
+
+### 项目结构说明
+
+- `functions/short.js`: 处理短链生成 (`/short`)，支持 JSON 和 FormData，包含覆盖逻辑。
+- `functions/query.js`: 处理短链反查 (`/query`)。
+- `functions/list.js`: 获取自定义短链列表 (`/list`)。
+- `functions/[id].js`: 处理短链跳转重定向。
+- `index.html`: 前端界面，支持生成、反查、历史记录查看。
