@@ -83,6 +83,29 @@
         outline: 0;
       }
 
+      /* 新增：输入框容器，用于定位右侧提示 */
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+      }
+
+      /* 新增：右侧固定提示 */
+      .input-suffix {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd; /* 浅灰色 */
+        font-size: 0.875rem;
+        pointer-events: none; /* 让点击穿透到输入框 */
+        white-space: nowrap;
+      }
+
+      /* 调整带后缀的输入框 padding，防止文字重叠 */
+      .input-with-suffix {
+        padding-right: 11rem; /* 根据提示文字长度调整 */
+      }
+
       details {
         margin: 0.5rem 0 1rem;
         border: none;
@@ -325,17 +348,21 @@
         <div>
 
           <!-- 第一行：生成短链设置 -->
-          <div class="row" style="margin-bottom: 0.25rem;"> <!-- 极小的下边距 -->
+          <div class="row" style="margin-bottom: 0.25rem;">
             <div class="col-auto" style="font-weight: bold; font-size: 0.875rem;">生成:</div>
             <div class="col">
-                <input placeholder="输入自定义后缀 (slug)，留空随机" x-model="slug" />
+                <!-- 修改：使用 input-wrapper 包裹输入框和后缀提示 -->
+                <div class="input-wrapper">
+                    <input class="input-with-suffix" placeholder="输入自定义后缀" x-model="slug" />
+                    <span class="input-suffix">留空随机</span>
+                </div>
             </div>
             <div class="col-auto">
                 <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)" style="margin-bottom: 0; width: auto; padding: 0.5rem 1rem;">生成</button>
             </div>
           </div>
 
-          <!-- 分割线：减小上下边距 -->
+          <!-- 分割线 -->
           <div style="border-top: 1px dashed var(--border-color); margin: 0.25rem 0;"></div>
 
           <!-- 第二行：反查长链 -->
