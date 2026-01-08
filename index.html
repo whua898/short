@@ -230,14 +230,16 @@
           <input placeholder="slug" x-model="slug" />
           <small>Slug 默认是随机生成的短 id。</small>
 
-          <!-- 新增：自定义短链下拉列表 -->
-          <div style="margin-top: 1rem;" x-show="customSlugs.length > 0">
+          <!-- 修改：始终显示下拉列表，方便调试 -->
+          <div style="margin-top: 1rem;">
             <label for="custom-slug-select" style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">已有的自定义短链：</label>
             <select id="custom-slug-select" @change="selectCustomSlug($event.target.value)">
               <option value="">-- 选择以反填 --</option>
               <template x-for="item in customSlugs" :key="item.slug">
                 <option :value="item.url" x-text="item.slug"></option>
               </template>
+              <!-- 如果没有数据，显示一个提示选项 -->
+              <option value="" disabled x-show="customSlugs.length === 0">暂无自定义短链</option>
             </select>
           </div>
 
@@ -268,6 +270,7 @@
           fetch('/list')
             .then(res => res.json())
             .then(res => {
+              console.log('List API response:', res); // 调试日志
               if (res.Code === 1 && Array.isArray(res.Data)) {
                 this.customSlugs = res.Data;
               }
@@ -279,8 +282,11 @@
         selectCustomSlug(selectedUrl) {
           if (selectedUrl) {
             this.url = selectedUrl;
-            // 也可以选择是否自动填充 slug 框，这里暂不填充，以免用户误以为要修改该 slug
-            // this.slug = ...
+            // 自动填充 slug 框，方便用户查看或修改
+            const selectedItem = this.customSlugs.find(item => item.url === selectedUrl);
+            if (selectedItem) {
+                this.slug = selectedItem.slug;
+            }
           }
         },
 
