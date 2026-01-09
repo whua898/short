@@ -28,8 +28,7 @@
      `ua` text,
      `ip` text,
      `status` int,
-     `create_time` DATE,
-     `is_custom` integer DEFAULT 0
+     `create_time` DATE
    );
    ```
 
@@ -46,11 +45,10 @@
    );
    ```
    
-   **如果是旧版本升级：**
-   请在 Console 中执行以下命令来添加 `is_custom` 字段，用于区分自定义短链：
-   ```sql
-   ALTER TABLE links ADD COLUMN is_custom INTEGER DEFAULT 0;
-   ```
+   **关于自定义短链的标记：**
+   本项目复用了 `status` 字段来区分短链类型，无需修改数据库结构：
+   - `status = 1`: 随机生成的短链。
+   - `status = 2`: 用户自定义的短链（会显示在前端的历史列表中）。
 
 8. 选择部署完成short项目，前往后台依次点击`设置`->`函数`->`D1 数据库绑定`->`编辑绑定`->变量名称填写：`DB` 命名空间 `选择你提前创建好的D1` 数据库绑定
 
@@ -170,7 +168,7 @@ npm run dev
 
 #### 3. 获取自定义列表 `GET /list`
 
-获取所有自定义生成的短链列表（即 `is_custom=1` 的记录）。
+获取所有自定义生成的短链列表（即 `status=2` 的记录）。
 
 **响应**
 
